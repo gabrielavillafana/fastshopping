@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ambev Connect</title>
 
-  <!-- PWA meta -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2196f3">
   <link rel="icon" href="icons/icon-192.png">
@@ -34,44 +33,60 @@
     #installBtn:hover {
       background: #1976d2;
     }
-    p {
-      font-size: 1.1rem;
-      line-height: 1.5;
+    #instructions {
+      display: none;
+      margin-top: 20px;
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #856404;
     }
   </style>
 </head>
 <body>
   <h1>Welcome to Ambev Connect!</h1>
-  <p>You can install this app directly on your device for quick access.THIS MUST WORK</p>
+  <p>Tap below to install this app on your device.</p>
 
-  <!-- The button is always visible -->
-  <button id="installBtn">📲 Install Ambev Connect</button>
+  <button id="installBtn">📲 Install Ambev Connect NOW</button>
+
+  <div id="instructions">
+    <p><strong>To install manually:</strong><br>
+    Tap <b>Share → Add to Home Screen</b> on your browser menu.</p>
+  </div>
 
   <script>
     let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+    const instructions = document.getElementById('instructions');
 
-    // Register the service worker
+    // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
     }
 
-    // Listen for the beforeinstallprompt event
+    // Listen for the install prompt
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
     });
 
-    // When user clicks the button
-    const installBtn = document.getElementById('installBtn');
+    // When user clicks install button
     installBtn.addEventListener('click', async () => {
-      // If the browser already decided installability
       if (deferredPrompt) {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to install: ${outcome}`);
+        if (outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+        } else {
+          console.log('User dismissed the install prompt');
+        }
         deferredPrompt = null;
       } else {
-        alert('If no prompt appears, you can install manually from your browser menu.');
+        // Show simple visual instructions if browser can't prompt automatically
+        instructions.style.display = 'block';
+        installBtn.style.display = 'none';
       }
     });
   </script>
