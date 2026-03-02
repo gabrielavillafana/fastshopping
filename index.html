@@ -14,20 +14,29 @@
 
   <button id="installBtn" style="display:none;">Install App</button>
 
+  <button id="installBtn" >Install App</button>
 
-  <script>
-    // Register the service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
 
-    // Handle install prompt
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('installBtn');
-      btn.style.display = 'block';
-      btn.addEventListener('click', () => e.prompt());
-    });
-  </script>
+
+  <button id="installBtn" style="display:none;">Install App</button>
+
+<script>
+let deferredPrompt;
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.getElementById('installBtn');
+  btn.style.display = 'block';
+  btn.onclick = () => {
+    deferredPrompt.prompt();
+  };
+});
+</script>
+
+  
 </body>
 </html>
