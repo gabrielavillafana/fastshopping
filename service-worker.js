@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ambev-cache-v1';
+const CACHE_NAME = 'ambev-connect-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -18,16 +18,14 @@ self.addEventListener('install', (event) => {
 // Activate event: clear old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(keys.map((key) => {
-        if (key !== CACHE_NAME) return caches.delete(key);
-      }));
-    })
+    caches.keys().then((keys) => Promise.all(keys.map(key => {
+      if (key !== CACHE_NAME) return caches.delete(key);
+    })))
   );
   self.clients.claim();
 });
 
-// Fetch event: network-first with fallback to cache
+// Fetch event: network-first strategy with fallback
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
