@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ambev Connect</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <meta name="theme-color" content="#2196f3">
+</head>
+<body>
+  <h1>Welcome to Ambev Connect!</h1>
+  <p>This is your installable PWA demo.</p>
+
+  <button id="installBtn" style="display:none;">Install App</button>
+
+  <script>
+    // Register the service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+
+    // Handle install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('installBtn');
+      btn.style.display = 'block';
+      btn.addEventListener('click', () => e.prompt());
+    });
+  </script>
+</body>
+</html>
