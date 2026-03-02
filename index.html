@@ -18,7 +18,20 @@
 
 
 
-  <button id="installBtn" style="display:none;">Install App</button>
+  <button id="installBtn" style="display:none;">Install App SAFARI</button>
+
+  <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
+
+// This event fires when the app is installable
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); // stop Chrome from showing its default prompt
+  e.prompt(); // immediately show the install popup!
+});
+</script>
+  
 
 <script>
 let deferredPrompt;
