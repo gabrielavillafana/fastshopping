@@ -5,7 +5,7 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2196f3",
-  "description": "Your simple PWA example app.",
+  "description": "Ambev Connect PWA App.",
   "icons": [
     {
       "src": "icons/icon-192.png",
