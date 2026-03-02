@@ -5,36 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ambev Connect</title>
 
-  <!-- PWA requirements -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2196f3">
   <link rel="icon" href="icons/icon-192.png">
 
   <style>
     body {
-      font-family: system-ui, sans-serif;
-      background: #f4f7ff;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(180deg, #e3f2fd 0%, #ffffff 100%);
       color: #222;
+      margin: 0;
+      padding: 0;
       text-align: center;
-      margin: 40px;
+      overflow-y: scroll;
     }
 
-    form {
+    header {
+      background: #2196f3;
+      color: white;
+      padding: 20px 10px;
+      font-size: 1.6rem;
+      font-weight: 600;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    }
+
+    main {
+      max-width: 500px;
+      margin: 30px auto;
       background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-      max-width: 400px;
-      margin: 0 auto;
+      border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      padding: 25px;
     }
 
-    input {
-      width: 80%;
+    input, select, textarea {
+      width: 90%;
       padding: 10px;
       margin: 10px 0;
       border-radius: 6px;
       border: 1px solid #ccc;
       font-size: 1rem;
+      box-sizing: border-box;
     }
 
     button {
@@ -62,24 +73,73 @@
     #installBtn:hover {
       background: #2e7d32;
     }
+
+    #timerBox {
+      display: none;
+      margin-top: 20px;
+      color: #f57c00;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    footer {
+      margin: 40px 0 20px;
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 6px;
+      background: #2196f3;
+      border-radius: 3px;
+      margin-top: 10px;
+      transition: width 1s linear;
+    }
   </style>
 </head>
 <body>
-  <h1>Welcome to Ambev Connect</h1>
-  <p>Enter your name to continue and install the app.</p>
+  <header>Ambev Connect</header>
 
-  <form id="userForm">
-    <input type="text" id="firstName" placeholder="First name" required>
-    <input type="text" id="lastName" placeholder="Last name" required>
-    <button type="submit">Continue</button>
-  </form>
+  <main>
+    <h2>Let’s get to know you</h2>
+    <p>Please complete the short form below. Once you’re done, you’ll be able to install Ambev Connect.</p>
 
-  <button id="installBtn">📲 Install Ambev Connect</button>
+    <form id="userForm">
+      <input type="text" id="firstName" placeholder="First name" required>
+      <input type="text" id="lastName" placeholder="Last name" required>
+      <input type="email" id="email" placeholder="Email address" required>
+      <input type="tel" id="phone" placeholder="Phone number" required>
+      <select id="interest" required>
+        <option value="">Select an interest</option>
+        <option>Shopping</option>
+        <option>Logistics</option>
+        <option>Technology</option>
+        <option>Business</option>
+      </select>
+      <textarea id="message" rows="3" placeholder="Tell us briefly why you love Ambev Connect"></textarea>
+
+      <button type="submit">Continue</button>
+    </form>
+
+    <div id="timerBox">⏳ Preparing installation... please wait <span id="countdown">15</span>s</div>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <button id="installBtn">📲 Install Ambev Connect</button>
+  </main>
+
+  <footer>© 2026 Ambev Connect | Progressive Web App</footer>
 
   <script>
     let deferredPrompt;
+    let engagementReady = false;
+    const form = document.getElementById('userForm');
+    const timerBox = document.getElementById('timerBox');
+    const countdown = document.getElementById('countdown');
+    const progressBar = document.getElementById('progressBar');
+    const installBtn = document.getElementById('installBtn');
 
-    // Register the service worker
+    // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
     }
@@ -90,17 +150,31 @@
       deferredPrompt = e;
     });
 
-    // When form is submitted (simulates engagement)
-    const form = document.getElementById('userForm');
-    const installBtn = document.getElementById('installBtn');
-
+    // Simulate engagement with form + scroll + timer
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const fname = document.getElementById('firstName').value.trim();
-      const lname = document.getElementById('lastName').value.trim();
+      form.style.display = 'none';
+      timerBox.style.display = 'block';
+      progressBar.style.display = 'block';
 
-      if (fname && lname) {
-        form.style.display = 'none';
+      let timeLeft = 15;
+      const total = 15;
+      const timer = setInterval(() => {
+        timeLeft--;
+        countdown.textContent = timeLeft;
+        progressBar.style.width = ((total - timeLeft) / total * 100) + "%";
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          timerBox.textContent = "✅ You're ready! Scroll to the bottom and click Install Ambev Connect.";
+          installBtn.style.display = 'inline-block';
+          engagementReady = true;
+        }
+      }, 1000);
+    });
+
+    // Detect scroll for additional engagement
+    window.addEventListener('scroll', () => {
+      if (engagementReady && deferredPrompt && installBtn.style.display === 'none') {
         installBtn.style.display = 'inline-block';
       }
     });
@@ -110,10 +184,10 @@
       if (deferredPrompt) {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to install: ${outcome}`);
+        console.log('User install choice:', outcome);
         deferredPrompt = null;
       } else {
-        alert('If no prompt appears, you can install manually from your browser menu.');
+        alert('If no install prompt appears, open your browser menu and choose "Install App".');
       }
     });
   </script>
