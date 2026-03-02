@@ -4,52 +4,71 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ambev Connect</title>
+
+  <!-- PWA meta -->
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icons/icon-192.png">
   <meta name="theme-color" content="#2196f3">
+  <link rel="icon" href="icons/icon-192.png">
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      text-align: center;
+      margin: 40px;
+      background: #f5f8ff;
+      color: #222;
+    }
+    #installBtn {
+      display: none;
+      margin-top: 20px;
+      padding: 12px 20px;
+      background: #2196f3;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: background 0.3s ease;
+    }
+    #installBtn:hover {
+      background: #1976d2;
+    }
+  </style>
 </head>
 <body>
   <h1>Welcome to Ambev Connect!</h1>
-  <p>This is your installable PWA demo.</p>
+  <p>This app can be installed directly to your device for faster access.</p>
 
-  <button id="installBtn" style="display:none;">Install App Top</button>
-
-  <button id="installBtn" >Install App Normal</button>
-
-
-
-  <button id="installBtn" style="">Install Appp SAFARI</button>
+  <button id="installBtn">📲 Install Ambev Connect</button>
 
   <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js');
-}
+    let deferredPrompt;
 
-// This event fires when the app is installable
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault(); // stop Chrome from showing its default prompt
-  e.prompt(); // immediately show the install popup!
-});
-</script>
-  
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
 
-<script>
-let deferredPrompt;
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js');
-}
+    // Listen for the install prompt event
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault(); // Prevent the default mini-infobar
+      deferredPrompt = e;
+      const btn = document.getElementById('installBtn');
+      btn.style.display = 'inline-block';
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const btn = document.getElementById('installBtn');
-  btn.style.display = 'block';
-  btn.onclick = () => {
-    deferredPrompt.prompt();
-  };
-});
-</script>
-
-  
+      btn.addEventListener('click', async () => {
+        btn.style.display = 'none';
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          console.log('User accepted the PWA install');
+        } else {
+          console.log('User dismissed the PWA install');
+        }
+        deferredPrompt = null;
+      });
+    });
+  </script>
 </body>
 </html>
