@@ -19,55 +19,60 @@
       color: #222;
     }
     #installBtn {
-      display: none;
-      margin-top: 20px;
-      padding: 12px 20px;
+      margin-top: 25px;
+      padding: 14px 22px;
       background: #2196f3;
       border: none;
       color: white;
-      border-radius: 8px;
-      font-size: 16px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
       transition: background 0.3s ease;
     }
     #installBtn:hover {
       background: #1976d2;
     }
+    p {
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
   <h1>Welcome to Ambev Connect!</h1>
-  <p>This app can be installed directly to your device for faster access.</p>
+  <p>You can install this app directly on your device for quick access.THIS MUST WORK</p>
 
+  <!-- The button is always visible -->
   <button id="installBtn">📲 Install Ambev Connect</button>
 
   <script>
     let deferredPrompt;
 
-    // Register service worker
+    // Register the service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
     }
 
-    // Listen for the install prompt event
+    // Listen for the beforeinstallprompt event
     window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault(); // Prevent the default mini-infobar
+      e.preventDefault();
       deferredPrompt = e;
-      const btn = document.getElementById('installBtn');
-      btn.style.display = 'inline-block';
+    });
 
-      btn.addEventListener('click', async () => {
-        btn.style.display = 'none';
+    // When user clicks the button
+    const installBtn = document.getElementById('installBtn');
+    installBtn.addEventListener('click', async () => {
+      // If the browser already decided installability
+      if (deferredPrompt) {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          console.log('User accepted the PWA install');
-        } else {
-          console.log('User dismissed the PWA install');
-        }
+        console.log(`User response to install: ${outcome}`);
         deferredPrompt = null;
-      });
+      } else {
+        alert('If no prompt appears, you can install manually from your browser menu.');
+      }
     });
   </script>
 </body>
