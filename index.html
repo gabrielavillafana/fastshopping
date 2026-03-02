@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ambev Connect</title>
 
+  <!-- PWA requirements -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2196f3">
   <link rel="icon" href="icons/icon-192.png">
@@ -12,81 +13,107 @@
   <style>
     body {
       font-family: system-ui, sans-serif;
+      background: #f4f7ff;
+      color: #222;
       text-align: center;
       margin: 40px;
-      background: #f5f8ff;
-      color: #222;
     }
-    #installBtn {
-      margin-top: 25px;
-      padding: 14px 22px;
+
+    form {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    input {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px 20px;
       background: #2196f3;
       border: none;
-      color: white;
-      border-radius: 10px;
-      font-size: 18px;
+      color: #fff;
+      border-radius: 8px;
+      font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
       transition: background 0.3s ease;
     }
-    #installBtn:hover {
+
+    button:hover {
       background: #1976d2;
     }
-    #instructions {
+
+    #installBtn {
       display: none;
-      margin-top: 20px;
-      background: #fff3cd;
-      border: 1px solid #ffeeba;
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 1rem;
-      color: #856404;
+      background: #43a047;
+    }
+
+    #installBtn:hover {
+      background: #2e7d32;
     }
   </style>
 </head>
 <body>
-  <h1>Welcome to Ambev Connect!</h1>
-  <p>Tap below to install this app on your device.</p>
+  <h1>Welcome to Ambev Connect</h1>
+  <p>Enter your name to continue and install the app.</p>
 
-  <button id="installBtn">📲 Install Ambev Connect DOWNLOADER</button>
+  <form id="userForm">
+    <input type="text" id="firstName" placeholder="First name" required>
+    <input type="text" id="lastName" placeholder="Last name" required>
+    <button type="submit">Continue</button>
+  </form>
 
-  <div id="instructions">
-    <p><strong>To install manually:</strong><br>
-    Tap <b>Share → Add to Home Screen</b> on your browser menu.</p>
-  </div>
+  <button id="installBtn">📲 Install Ambev Connect</button>
 
   <script>
     let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
-    const instructions = document.getElementById('instructions');
 
-    // Register service worker
+    // Register the service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
     }
 
-    // Listen for the install prompt
+    // Capture install prompt event
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
     });
 
-    // When user clicks install button
+    // When form is submitted (simulates engagement)
+    const form = document.getElementById('userForm');
+    const installBtn = document.getElementById('installBtn');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fname = document.getElementById('firstName').value.trim();
+      const lname = document.getElementById('lastName').value.trim();
+
+      if (fname && lname) {
+        form.style.display = 'none';
+        installBtn.style.display = 'inline-block';
+      }
+    });
+
+    // When user clicks Install
     installBtn.addEventListener('click', async () => {
       if (deferredPrompt) {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          console.log('User accepted the install prompt');
-        } else {
-          console.log('User dismissed the install prompt');
-        }
+        console.log(`User response to install: ${outcome}`);
         deferredPrompt = null;
       } else {
-        // Show simple visual instructions if browser can't prompt automatically
-        instructions.style.display = 'block';
-        installBtn.style.display = 'none';
+        alert('If no prompt appears, you can install manually from your browser menu.');
       }
     });
   </script>
